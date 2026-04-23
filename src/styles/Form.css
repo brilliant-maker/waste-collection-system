@@ -1,0 +1,108 @@
+/* ────────────────────────────────────────────────
+   Form
+───────────────────────────────────────────────── */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  width: 100%;
+}
+
+/* Inline form (optional utility) */
+.form-inline {
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+/* ────────────────────────────────────────────────
+   Fieldset
+───────────────────────────────────────────────── */
+.fieldset {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+
+  padding: 16px;
+  margin-bottom: 16px;
+
+  background-color: var(--background-color-2);
+}
+
+/* Subtle variant */
+.fieldset-muted {
+  background-color: var(--background-color-3);
+  border-color: var(--border-color-soft);
+}
+
+/* ────────────────────────────────────────────────
+   Legend
+───────────────────────────────────────────────── */
+.legend {
+  padding: 0 6px;
+
+  font-size: 0.9rem;
+  font-weight: 500;
+
+  color: var(--text-color-2);
+}
+
+/* Strong legend (section titles) */
+.legend-strong {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-color-1);
+}
+
+/* ────────────────────────────────────────────────
+   Form Group (label + input wrapper)
+───────────────────────────────────────────────── */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Inline group (label + input side by side) */
+.form-group-inline {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* ────────────────────────────────────────────────
+   Form Actions (buttons area)
+───────────────────────────────────────────────── */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+/* Mobile-friendly stacked actions */
+.form-actions-stacked {
+  flex-direction: column;
+}
+
+/* ────────────────────────────────────────────────
+   Responsive
+───────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .form {
+    gap: 12px;
+  }
+
+  .fieldset {
+    padding: 12px;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+}

@@ -1,0 +1,100 @@
+/* disable transitions on first load */
+html.no-transition * {
+  transition: none !important;
+}
+
+/* ────────────────────────────────────────────────
+   Light Theme
+───────────────────────────────────────────────── */
+:root {
+  /* Base backgrounds */
+  --background-color-1: #ffffff;
+  --background-color-2: #fafafa;
+  --background-color-3: #f4f4f5;
+
+  /* Text */
+  --text-color-1: #18181b;
+  --text-color-2: #52525b;
+
+  /* Borders */
+  --border-color: #e4e4e7;
+  --border-color-soft: #f1f1f3;
+  --border-color-strong: #d4d4d8;
+
+  /* Shadow */
+  --shadow-color: rgba(0, 0, 0, 0.08);
+
+  /* ───────── Semantic Colors ───────── */
+  --color-primary: #3b82f6;
+  --color-secondary: #e4e4e7;
+  --color-outline: transparent;
+
+  --color-danger: #ef4444;
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-info: #0ea5e9;
+
+  --color-muted: #f4f4f5;
+  --color-surface: #fafafa;
+
+  /* ───────── Contrast (text on colors) ───────── */
+  --color-on-primary: #ffffff;
+  --color-on-secondary: #18181b;
+  --color-on-outline: #18181b;
+
+  --color-on-danger: #ffffff;
+  --color-on-success: #ffffff;
+  --color-on-warning: #111111;
+  --color-on-info: #ffffff;
+
+  --color-on-muted: #52525b;
+  --color-on-surface: #18181b;
+}
+
+/* ────────────────────────────────────────────────
+   Dark Theme
+───────────────────────────────────────────────── */
+[data-theme="dark"] {
+  /* Base backgrounds */
+  --background-color-1: #0f0f10;
+  --background-color-2: #18181b;
+  --background-color-3: #27272a;
+
+  /* Text */
+  --text-color-1: #fafafa;
+  --text-color-2: #d4d4d8;
+
+  /* Borders */
+  --border-color: #27272a;
+  --border-color-soft: #1f1f23;
+  --border-color-strong: #3f3f46;
+
+  /* Shadow */
+  --shadow-color: rgba(0, 0, 0, 0.6);
+
+  /* ───────── Semantic Colors ───────── */
+  --color-primary: #60a5fa;
+  --color-secondary: #27272a;
+  --color-outline: transparent;
+
+  --color-danger: #f87171;
+  --color-success: #34d399;
+  --color-warning: #fbbf24;
+  --color-info: #38bdf8;
+  
+  --color-muted: #27272a;
+  --color-surface: #18181b;
+
+  /* ───────── Contrast ───────── */
+  --color-on-primary: #111111;
+  --color-on-secondary: #fafafa;
+  --color-on-outline: #fafafa;
+
+  --color-on-danger: #111111;
+  --color-on-success: #111111;
+  --color-on-warning: #111111;
+  --color-on-info: #111111;
+
+  --color-on-muted: #d4d4d8;
+  --color-on-surface: #fafafa;
+}

@@ -1,0 +1,169 @@
+/* Base button */
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+
+  font-weight: 500;
+  line-height: 1.4;
+  white-space: nowrap;
+
+  cursor: pointer;
+  user-select: none;
+
+  background-color: var(--background-color-2);
+  color: var(--text-color-2);
+
+  transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease, background-color 0.15s ease;
+
+  min-height: 40px;
+  padding: 10px 18px;
+  font-size: 0.95rem;
+}
+
+/* Sizes */
+.button-small {
+  padding: 8px 14px;
+  font-size: 0.875rem;
+  border-radius: 6px;
+  min-height: 36px;
+}
+
+.button-medium {
+  padding: 10px 18px;
+}
+
+.button-large {
+  padding: 12px 24px;
+  font-size: 1.05rem;
+  border-radius: 10px;
+  min-height: 48px;
+}
+
+/* ────────────────────────────────────────────────
+   Variants (semantic)
+───────────────────────────────────────────────── */
+
+/* Primary */
+.button-primary {
+  background-color: var(--color-primary);
+  color: var(--color-on-primary);
+  border-color: var(--color-primary);
+}
+
+/* Secondary (neutral filled) */
+.button-secondary {
+  background-color: var(--color-secondary);
+  color: var(--color-on-secondary);
+  border-color: var(--border-color);
+}
+
+/* Outline */
+.button-outline {
+  background-color: var(--color-outline);
+  color: var(--color-on-outline);
+  border-color: var(--border-color);
+}
+
+/* Muted (subtle background) */
+.button-muted {
+  background-color: var(--color-muted);
+  color: var(--color-on-muted);
+  border-color: var(--border-color-soft);
+}
+
+/* Surface (card-like button) */
+.button-surface {
+  background-color: var(--color-surface);
+  color: var(--color-on-surface);
+  border-color: var(--border-color);
+}
+
+/* Danger */
+.button-danger {
+  background-color: var(--color-danger);
+  color: var(--color-on-danger);
+  border-color: var(--color-danger);
+}
+
+/* Success */
+.button-success {
+  background-color: var(--color-success);
+  color: var(--color-on-success);
+  border-color: var(--color-success);
+}
+
+/* Warning */
+.button-warning {
+  background-color: var(--color-warning);
+  color: var(--color-on-warning);
+  border-color: var(--color-warning);
+}
+
+/* Info */
+.button-info {
+  background-color: var(--color-info);
+  color: var(--color-on-info);
+  border-color: var(--color-info);
+}
+
+/* ────────────────────────────────────────────────
+   States
+───────────────────────────────────────────────── */
+
+/* Hover */
+.button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  filter: brightness(0.97);
+}
+
+/* Active */
+.button:active:not(:disabled) {
+  transform: translateY(0);
+  filter: brightness(0.92);
+}
+
+/* Focus */
+.button:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--shadow-color);
+}
+
+/* Disabled */
+.button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  filter: none;
+}
+
+/* ────────────────────────────────────────────────
+   Utilities
+───────────────────────────────────────────────── */
+.button-full {
+  width: 100%;
+}
+
+/* ────────────────────────────────────────────────
+   Responsive
+───────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .button {
+    min-width: 110px;
+  }
+
+  .button-large {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .modal-footer .button,
+  .flex-buttons .button {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+}

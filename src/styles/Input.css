@@ -1,0 +1,107 @@
+/* Base input */
+.input {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+
+  padding: 8px 12px;
+  font-size: 1rem;
+  line-height: 1.5;
+
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+
+  background-color: var(--background-color-2);
+  color: var(--text-color-2);
+
+  outline: none;
+  font-family: inherit;
+
+  transition: border 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Hover + Focus */
+.input:hover {
+  border-color: var(--text-color-2);
+}
+
+.input:focus {
+  border-color: var(--text-color-2);
+  box-shadow: 0 0 0 2px var(--shadow-color);
+}
+
+/* Sizes */
+.input-small {
+  padding: 6px 10px;
+  font-size: 0.875rem;
+  border-radius: 4px;
+}
+
+.input-medium {
+  padding: 8px 12px;
+}
+
+.input-large {
+  padding: 10px 16px;
+  font-size: 1.125rem;
+  border-radius: 8px;
+}
+
+/* States */
+.input-error {
+  border-color: var(--text-color-2);
+  opacity: 0.7;
+}
+
+.input-disabled {
+  background-color: rgba(128, 128, 128, 0.2);
+  color: var(--text-color-2);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Input types */
+.input[type="number"]::-webkit-inner-spin-button,
+.input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.input[type="color"] {
+  padding: 0;
+  height: 2.5rem;
+  width: 2.5rem;
+  border-radius: 50%;
+}
+
+textarea.input {
+  resize: vertical;
+  min-height: 80px;
+}
+
+/* Placeholder */
+.input::placeholder {
+  color: var(--text-color-3);
+  opacity: 0.5;
+}
+
+/* Label */
+.input-label {
+  display: block;
+  margin-top: 4px;
+  margin-bottom: 4px;
+  font-weight: 500;
+  font-size: 0.95rem;
+  color: var(--text-color-2);
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .input,
+  .input-small,
+  .input-medium,
+  .input-large {
+    font-size: 1rem;
+    padding: 8px 12px;
+  }
+}

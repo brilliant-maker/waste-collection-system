@@ -1,0 +1,104 @@
+/* ────────────────────────────────────────────────
+   Toast Container
+───────────────────────────────────────────────── */
+.toast-wrap {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  z-index: 9999;
+}
+
+/* ────────────────────────────────────────────────
+   Base Toast
+───────────────────────────────────────────────── */
+.toast {
+  min-width: 220px;
+  max-width: 320px;
+
+  padding: 10px 12px;
+  border-radius: 8px;
+
+  font-size: 0.9rem;
+  line-height: 1.4;
+
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  border: 1px solid var(--border-color);
+  background-color: var(--background-color-2);
+  color: var(--text-color-1);
+
+  box-shadow: 0 6px 18px var(--shadow-color);
+
+  animation: toast-enter 0.18s ease-out;
+}
+
+/* ────────────────────────────────────────────────
+   Variants (Semantic)
+───────────────────────────────────────────────── */
+.toast-info {
+  background-color: var(--color-info);
+  color: var(--color-on-info);
+  border-color: var(--color-info);
+}
+
+.toast-success {
+  background-color: var(--color-success);
+  color: var(--color-on-success);
+  border-color: var(--color-success);
+}
+
+.toast-error {
+  background-color: var(--color-danger);
+  color: var(--color-on-danger);
+  border-color: var(--color-danger);
+}
+
+.toast-warning {
+  background-color: var(--color-warning);
+  color: var(--color-on-warning);
+  border-color: var(--color-warning);
+}
+
+/* Optional subtle version */
+.toast-muted {
+  background-color: var(--background-color-3);
+  color: var(--text-color-2);
+  border-color: var(--border-color-soft);
+}
+
+/* ────────────────────────────────────────────────
+   Animation
+───────────────────────────────────────────────── */
+@keyframes toast-enter {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ────────────────────────────────────────────────
+   Responsive
+───────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .toast-wrap {
+    top: 12px;
+    right: 12px;
+    left: 12px;
+  }
+
+  .toast {
+    width: 100%;
+    max-width: 100%;
+  }
+}

@@ -1,0 +1,95 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  border-radius: 8px;
+  margin: 5px;
+  overflow: hidden;
+
+  border: 1px solid var(--border-color);
+  background-color: var(--background-color-2);
+  color: var(--text-color-2);
+
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 16px;
+
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Sizes */
+.card-small { padding: 12px; border-radius: 6px; }
+.card-medium { padding: 16px; }
+.card-large { padding: 24px; border-radius: 12px; }
+
+/* Sections */
+.card-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  padding: 16px;
+  font-weight: 600;
+
+  border-bottom: 1px solid var(--border-color);
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.card-main {
+  padding: 10px;
+  overflow-y: auto;
+}
+
+.card-main-button {
+  margin-top: 5px;
+}
+
+.card-footer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  padding: 16px;
+  border-top: 1px solid var(--border-color);
+}
+
+/* Image */
+.card-image {
+  width: 100%;
+  display: block;
+  object-fit: cover;
+  border-bottom: 1px solid var(--border-color);
+}
+
+/* Actions */
+.card-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+/* Hover */
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+/* Variants */
+.card-outlined {
+  border: 1px solid var(--border-color);
+}
+
+.card-elevated {
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+}
+
+.card-rounded-sm { border-radius: 4px; }
+.card-rounded-lg { border-radius: 16px; }
+
+/* Responsive */
+@media (max-width: 640px) {
+  .card {
+    padding: 14px;
+    margin: 8px;
+  }
+}

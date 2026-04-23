@@ -1,0 +1,97 @@
+/* ────────────────────────────────────────────────
+   Navigation Container
+───────────────────────────────────────────────── */
+.navigation {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  padding: 12px;
+
+  background-color: var(--background-color-2);
+  border-right: 1px solid var(--border-color);
+}
+
+/* ────────────────────────────────────────────────
+   Navigation Header
+───────────────────────────────────────────────── */
+.navigation-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding-bottom: 8px;
+  margin-bottom: 8px;
+
+  border-bottom: 1px solid var(--border-color-soft);
+}
+
+/* Example: logo/title inside header */
+.navigation-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-color-1);
+}
+
+/* ────────────────────────────────────────────────
+   Navigation Main (renamed)
+───────────────────────────────────────────────── */
+.navigation-main {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Navigation item wrapper */
+.navigation-item {
+  display: flex;
+  align-items: center;
+}
+
+/* Divider */
+.navigation-divider {
+  height: 1px;
+  background-color: var(--border-color-soft);
+  margin: 8px 0;
+}
+
+/* Footer (e.g. logout) */
+.navigation-footer {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* ────────────────────────────────────────────────
+   Horizontal variant (top nav)
+───────────────────────────────────────────────── */
+.navigation-horizontal {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+
+  border-right: none;
+  border-bottom: 1px solid var(--border-color);
+}
+
+/* When horizontal, main becomes row */
+.navigation-horizontal .navigation-main {
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+}
+
+/* ────────────────────────────────────────────────
+   Responsive
+───────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .navigation {
+    padding: 8px;
+  }
+
+  .navigation-horizontal {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+}

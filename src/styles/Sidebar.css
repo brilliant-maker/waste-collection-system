@@ -1,0 +1,79 @@
+/* ────────────────────────────────────────────────
+   Sidebar Base
+───────────────────────────────────────────────── */
+.sidebar {
+  display: flex;
+  flex-direction: column;
+
+  width: 200px;
+  padding: 16px;
+
+  background-color: var(--background-color-1);
+  border-right: 1px solid var(--border-color);
+
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+/* ────────────────────────────────────────────────
+   Sidebar Sections
+───────────────────────────────────────────────── */
+
+/* Header (logo / title) */
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+
+  border-bottom: 1px solid var(--border-color-soft);
+}
+
+/* Main navigation area */
+.sidebar-main {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  flex: 1 1 auto;
+}
+
+/* Footer (e.g. logout) */
+.sidebar-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  margin-top: auto;
+  padding-top: 12px;
+
+  border-top: 1px solid var(--border-color-soft);
+}
+
+/* Divider */
+.sidebar-divider {
+  height: 1px;
+  background-color: var(--border-color-soft);
+  margin: 8px 0;
+}
+
+/* ────────────────────────────────────────────────
+   Mobile Behavior (off-canvas handled by Layout)
+───────────────────────────────────────────────── */
+
+/* Optional enhancement: smoother feel */
+.sidebar.open {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+/* ────────────────────────────────────────────────
+   Responsive (Desktop handled in Layout.css)
+───────────────────────────────────────────────── */
+@media (min-width: 769px) {
+  .sidebar {
+    transform: none;
+    opacity: 1;
+  }
+}

@@ -1,0 +1,77 @@
+/* ────────────────────────────────────────────────
+   Base Link
+───────────────────────────────────────────────── */
+.link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: 500;
+
+  color: var(--text-color-2);
+  background-color: transparent;
+
+  padding: 6px 10px;
+  border-radius: 6px;
+
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+/* Hover */
+.link:hover {
+  color: var(--text-color-1);
+  background-color: var(--background-color-3);
+}
+
+/* Focus */
+.link:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--shadow-color);
+}
+
+/* Active (NavLink) */
+.link-active {
+  color: var(--color-primary);
+  background-color: var(--background-color-3);
+}
+
+/* Disabled (optional utility) */
+.link-disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* ────────────────────────────────────────────────
+   Variants
+───────────────────────────────────────────────── */
+
+/* Primary link */
+.link-primary {
+  color: var(--color-primary);
+}
+
+.link-primary:hover {
+  filter: brightness(0.95);
+}
+
+/* Muted link */
+.link-muted {
+  color: var(--text-color-2);
+}
+
+/* Danger link */
+.link-danger {
+  color: var(--color-danger);
+}
+
+/* ────────────────────────────────────────────────
+   Responsive
+───────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .link {
+    width: 100%;
+    justify-content: flex-start;
+  }
+}
