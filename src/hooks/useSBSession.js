@@ -2,8 +2,8 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import supabase from "../api/supabase.js";
 
 export default function useSBSession() {
-
-  const mountedRef = useRef(true);
+  const mountedRef = useRef(false);
+  const lastRefreshRef = useRef(0); // throttle refresh
 
   const [session, setSession] = useState(null);
   const [user, setUser] = useState(null);
@@ -13,50 +13,63 @@ export default function useSBSession() {
 
   // ─── Retrieve Session ───
   const retrieveSession = useCallback(async () => {
-
     try {
+      setSessionError(null);
 
       const { data, error } = await supabase.auth.getSession();
       if (error) throw error;
 
       if (!mountedRef.current) return;
 
-      setSession(data?.session ?? null);
-      setUser(data.session?.user ?? null);
+      const newSession = data?.session ?? null;
+
+      setSession(prev =>
+        prev?.access_token === newSession?.access_token ? prev : newSession
+      );
+
+      setUser(prev =>
+        prev?.id === newSession?.user?.id
+          ? prev
+          : newSession?.user ?? null
+      );
 
     } catch (err) {
-
       console.error("Session retrieval failed:", err);
-      setSessionError(err.message || "Failed to load session");
-
+      if (mountedRef.current) {
+        setSessionError(err.message || "Failed to load session");
+      }
     }
-
   }, []);
 
-  // ─── Refresh Session ───
+  // ─── SAFE Refresh (throttled) ───
   const refreshSession = useCallback(async () => {
+    const now = Date.now();
+
+    // ⛔ Prevent spamming → avoids 429
+    if (now - lastRefreshRef.current < 60000) return;
+
+    lastRefreshRef.current = now;
 
     try {
-
       const { data, error } = await supabase.auth.refreshSession();
       if (error) throw error;
 
       if (!mountedRef.current) return;
 
-      setSession(data?.session);
-      setUser(data.session?.user ?? null);
+      const newSession = data?.session ?? null;
+
+      setSession(newSession);
+      setUser(newSession?.user ?? null);
 
     } catch (err) {
-
-      setSessionError(err.message || "Failed to refresh session");
-
+      if (mountedRef.current) {
+        setSessionError(err.message || "Failed to refresh session");
+      }
     }
-
   }, []);
 
   // ─── Initialize ───
   useEffect(() => {
-
     mountedRef.current = true;
 
     const init = async () => {
@@ -68,28 +81,35 @@ export default function useSBSession() {
 
     init();
 
-    const { data: { subscription } } =
-      supabase.auth.onAuthStateChange((_event, newSession) => {
+    const {
+      data: { subscription }
+    } = supabase.auth.onAuthStateChange((_event, newSession) => {
+      if (!mountedRef.current) return;
 
-        if (!mountedRef.current) return;
+      setSession(prev =>
+        prev?.access_token === newSession?.access_token
+          ? prev
+          : newSession
+      );
 
-        setSession(newSession);
-        setUser(newSession?.user ?? null);
-        setIsSessionLoading(false);
+      setUser(prev =>
+        prev?.id === newSession?.user?.id
+          ? prev
+          : newSession?.user ?? null
+      );
 
-      });
+      setIsSessionLoading(false);
+    });
 
     return () => {
       mountedRef.current = false;
       subscription.unsubscribe();
     };
-
   }, [retrieveSession]);
 
   const isAuthenticated = !!user;
 
   return {
-
     session,
     user,
 
@@ -99,8 +119,6 @@ export default function useSBSession() {
     sessionError,
 
     retrieveSession,
-    refreshSession
-
+    refreshSession // safe but optional
   };
-
 }

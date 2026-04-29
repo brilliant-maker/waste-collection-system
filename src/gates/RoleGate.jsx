@@ -10,49 +10,56 @@ export default function RoleGate({
   showLoading = true,
   children
 }) {
+  const {
+    isAuthenticated,
+    isSessionLoading
+  } = useSession();
 
-  const { isAuthenticated } = useSession();
+  const {
+    profile,
+    isProfileLoading,
+    profileError
+  } = useProfile();
 
-  const { profile, isProfileLoading, profileError } = useProfile();
-  
-  const isReady = !!isAuthenticated && !!profile;
-  
-  const role = profile?.role_type ?? null;
-
-  if (isProfileLoading || !isReady) {
-
+  // ─── 1. Loading State ───
+  if (isSessionLoading || isProfileLoading) {
     if (!showLoading) return null;
 
     return (
       <LoadingText>
-        Loading Profile...
+        Loading...
       </LoadingText>
     );
   }
 
-  if (isReady && !isAuthenticated) {
+  // ─── 2. Not Authenticated ───
+  if (!isAuthenticated) {
     return <Navigate to="/signin" replace />;
   }
 
-  if (isReady && profileError) {
+  // ─── 3. Profile Error ───
+  if (profileError) {
     return (
       <ErrorText>
-        {profileError}
+        {profileError.message || "Failed to load profile"}
       </ErrorText>
     );
   }
 
-  if (isReady && !role) {
+  // ─── 4. Missing Profile / Role ───
+  const role = profile?.role_type;
+
+  if (!role) {
     return <Navigate to={redirectTo} replace />;
   }
 
+  // ─── 5. Role Check ───
   const requiredRoles = Array.isArray(roles) ? roles : [roles];
 
-  const hasAccess = requiredRoles.includes(role);
-
-  if (!hasAccess) {
+  if (!requiredRoles.includes(role)) {
     return <Navigate to={redirectTo} replace />;
   }
 
+  // ─── 6. Access Granted ───
   return children ?? <Outlet />;
 }
