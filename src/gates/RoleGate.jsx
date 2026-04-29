@@ -21,23 +21,24 @@ export default function RoleGate({
     profileError
   } = useProfile();
 
-  // ─── 1. Loading State ───
-  if (isSessionLoading || isProfileLoading) {
+  // ─── 1. Session loading ───
+  if (isSessionLoading) {
     if (!showLoading) return null;
-
-    return (
-      <LoadingText>
-        Loading...
-      </LoadingText>
-    );
+    return <LoadingText>Checking session...</LoadingText>;
   }
 
-  // ─── 2. Not Authenticated ───
+  // ─── 2. Not authenticated ───
   if (!isAuthenticated) {
     return <Navigate to="/signin" replace />;
   }
 
-  // ─── 3. Profile Error ───
+  // ─── 3. Profile loading ───
+  if (isProfileLoading) {
+    if (!showLoading) return null;
+    return <LoadingText>Loading profile...</LoadingText>;
+  }
+
+  // ─── 4. Profile error ───
   if (profileError) {
     return (
       <ErrorText>
@@ -46,20 +47,25 @@ export default function RoleGate({
     );
   }
 
-  // ─── 4. Missing Profile / Role ───
-  const role = profile?.role_type;
+  // ─── 5. No profile (IMPORTANT) ───
+  if (!profile) {
+    return <Navigate to={redirectTo} replace />;
+  }
 
+  const role = profile.role_type;
+
+  // ─── 6. Missing role ───
   if (!role) {
     return <Navigate to={redirectTo} replace />;
   }
 
-  // ─── 5. Role Check ───
+  // ─── 7. Role check ───
   const requiredRoles = Array.isArray(roles) ? roles : [roles];
 
   if (!requiredRoles.includes(role)) {
     return <Navigate to={redirectTo} replace />;
   }
 
-  // ─── 6. Access Granted ───
+  // ─── 8. Access granted ───
   return children ?? <Outlet />;
 }

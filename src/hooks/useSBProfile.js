@@ -1,11 +1,9 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback } from "react";
 import useSession from "./useSession.js";
 import supabase from "../api/supabase.js";
 
 export default function useSBProfile() {
   const { user } = useSession();
-
-  const lastUserIdRef = useRef(null);
 
   const [profile, setProfile] = useState(null);
   const [isProfileLoading, setIsProfileLoading] = useState(true);
@@ -26,13 +24,11 @@ export default function useSBProfile() {
         .from("profiles_view")
         .select("*")
         .eq("user_id", user.id)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
 
-      setProfile(prev =>
-        JSON.stringify(prev) === JSON.stringify(data) ? prev : data
-      );
+      setProfile(data ?? null);
 
       return data;
 
@@ -48,21 +44,16 @@ export default function useSBProfile() {
     }
   }, [user]);
 
-  // ─── Fetch only when user ID changes ───
+  // ✅ ALWAYS run when user changes
   useEffect(() => {
-    if (!user?.id) {
+    if (!user) {
       setProfile(null);
       setIsProfileLoading(false);
       return;
     }
 
-    if (lastUserIdRef.current === user.id) return;
-
-    lastUserIdRef.current = user.id;
-
     retrieveProfile();
-
-  }, [user?.id, retrieveProfile]);
+  }, [user, retrieveProfile]);
 
   return {
     profile,
