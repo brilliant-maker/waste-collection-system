@@ -1,24 +1,13 @@
-import { useState, useCallback } from "react";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import supabase from "../api/supabase.js";
 
 export default function useSBAuth({ confirmEmail = false } = {}) {
 
-  const [isSigningUp, setIsSigningUp] = useState(false);
-  const [isSigningIn, setIsSigningIn] = useState(false);
-  const [isSigningOut, setIsSigningOut] = useState(false);
+  const queryClient = useQueryClient();
 
-  const [signUpError, setSignUpError] = useState(null);
-  const [signInError, setSignInError] = useState(null);
-  const [signOutError, setSignOutError] = useState(null);
-
-  // ─── Sign Up ───
-  const signUp = useCallback(async ({ email, password, options = {} }) => {
-
-    setIsSigningUp(true);
-    setSignUpError(null);
-
-    try {
-
+  // ─── Sign Up Mutation ───
+  const signUpMutation = useMutation({
+    mutationFn: async ({ email, password, options = {} }) => {
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -26,91 +15,65 @@ export default function useSBAuth({ confirmEmail = false } = {}) {
       });
 
       if (error) throw error;
-
       return data;
+    },
+    onSuccess: () => {
+      // Robust guard fallback to force state refresh
+      queryClient.invalidateQueries({ queryKey: ['supabase', 'session'] });
+    },
+  });
 
-    } catch (err) {
-
-      setSignUpError(err.message || "Sign up failed");
-      throw err;
-
-    } finally {
-
-      setIsSigningUp(false);
-
-    }
-
-  }, [confirmEmail]);
-
-  // ─── Sign In ───
-  const signIn = useCallback(async ({ email, password }) => {
-
-    setIsSigningIn(true);
-    setSignInError(null);
-
-    try {
-
-      const { data, error } =
-        await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
+  // ─── Sign In Mutation ───
+  const signInMutation = useMutation({
+    mutationFn: async ({ email, password }) => {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
       if (error) throw error;
-
       return data;
+    },
+    onSuccess: () => {
+      // Robust guard fallback to force state refresh
+      queryClient.invalidateQueries({ queryKey: ['supabase', 'session'] });
+    },
+  });
 
-    } catch (err) {
-
-      setSignInError(err.message || "Sign in failed");
-      throw err;
-
-    } finally {
-
-      setIsSigningIn(false);
-
-    }
-
-  }, []);
-
-  // ─── Sign Out ───
-  const signOut = useCallback(async () => {
-
-    setIsSigningOut(true);
-    setSignOutError(null);
-
-    try {
-
+  // ─── Sign Out Mutation ───
+  const signOutMutation = useMutation({
+    mutationFn: async () => {
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
+    },
+    onSuccess: () => {
+      // Setting cache directly to null cleanly forces the UI logout 
+      // without triggering an accidental, early re-fetch race condition.
+      queryClient.setQueryData(['supabase', 'session'], null);
+    },
+  });
 
-    } catch (err) {
-
-      setSignOutError(err.message || "Sign out failed");
-      throw err;
-
-    } finally {
-
-      setIsSigningOut(false);
-
-    }
-
-  }, []);
+  // Convenience wrappers (React Compiler optimized using component-safe .mutate)
+  const signUp = (payload) => signUpMutation.mutate(payload);
+  const signIn = (payload) => signInMutation.mutate(payload);
+  const signOut = () => signOutMutation.mutate();
 
   return {
-
     signUp,
     signIn,
     signOut,
 
-    isSigningUp,
-    isSigningIn,
-    isSigningOut,
+    isSigningUp: signUpMutation.isPending,
+    isSigningIn: signInMutation.isPending,
+    isSigningOut: signOutMutation.isPending,
 
-    signUpError,
-    signInError,
-    signOutError
+    signUpError: signUpMutation.error?.message || null,
+    signInError: signInMutation.error?.message || null,
+    signOutError: signOutMutation.error?.message || null,
 
+    // Exposed raw mutations so you can still use .mutateAsync() on demand!
+    signUpMutation,
+    signInMutation,
+    signOutMutation,
   };
-
 }

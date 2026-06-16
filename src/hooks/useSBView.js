@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback } from "react";
+import { useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import supabase from "../api/supabase.js";
 
 export default function useSBView({
@@ -6,49 +7,64 @@ export default function useSBView({
   retrieveFields = "*",
   filters = [],        // [{ column, operator = "eq", value }]
   orderBy = null,      // { column, ascending: true }
-  limit = null         // number
+  limit = null,
 }) {
 
-  const [items, setItems] = useState([]);
-  const [isRetrieving, setIsRetrieving] = useState(false);
-  const [retrieveError, setRetrieveError] = useState(null);
+  // 1. Memoize serialized complex inputs to completely protect the TanStack queryKey
+  const serializedFilters = useMemo(() => {
+    return JSON.stringify(filters);
+  }, [filters]);
 
-  const fieldsKey = Array.isArray(retrieveFields)
-    ? retrieveFields.join(",")
-    : retrieveFields;
+  const serializedOrderBy = useMemo(() => {
+    return orderBy ? JSON.stringify(orderBy) : '';
+  }, [orderBy]);
 
-  const retrieveItems = useCallback(async () => {
+  const fieldsString = useMemo(() => {
+    return Array.isArray(retrieveFields) ? retrieveFields.join(",") : retrieveFields;
+  }, [retrieveFields]);
 
-    if (!view) return;
+  // 2. Memoize the queryKey structure itself so its array reference remains stable
+  const queryKey = useMemo(() => {
+    return [
+      'supabase_view',
+      view,
+      fieldsString,
+      serializedFilters,
+      serializedOrderBy,
+      limit,
+    ].filter(Boolean);
+  }, [view, fieldsString, serializedFilters, serializedOrderBy, limit]);
 
-    setIsRetrieving(true);
-    setRetrieveError(null);
-
-    try {
-
-      const selectFields = Array.isArray(retrieveFields)
-        ? retrieveFields.join(", ")
-        : retrieveFields;
+  // ─── Fetch view data ───
+  const {
+    data: items = [],
+    isLoading: isRetrieving,
+    error: retrieveError,
+    refetch: retrieveItems,
+  } = useQuery({
+    queryKey,
+    queryFn: async () => {
+      if (!view) return [];
 
       let query = supabase
         .from(view)
-        .select(selectFields);
+        .select(fieldsString);
 
-      // ─── Apply filters (.eq, .gt, etc.) ───
+      // Apply filters safely
       filters.forEach(({ column, operator = "eq", value }) => {
         if (typeof query[operator] === "function") {
           query = query[operator](column, value);
         }
       });
 
-      // ─── Apply ordering ───
+      // Apply ordering
       if (orderBy?.column) {
         query = query.order(orderBy.column, {
-          ascending: orderBy.ascending ?? true
+          ascending: orderBy.ascending ?? true,
         });
       }
 
-      // ─── Apply limit ───
+      // Apply limit
       if (limit) {
         query = query.limit(limit);
       }
@@ -56,32 +72,16 @@ export default function useSBView({
       const { data, error } = await query;
 
       if (error) throw error;
-
-      // Simple overwrite (no realtime merging needed)
-      setItems(data ?? []);
-
-    } catch (err) {
-
-      console.error(`Retrieve ${view} failed:`, err);
-      setRetrieveError(err.message || `Failed to load ${view}`);
-
-    } finally {
-
-      setIsRetrieving(false);
-
-    }
-
-  }, [view, fieldsKey, JSON.stringify(filters), orderBy, limit]);
-
-  useEffect(() => {
-    retrieveItems();
-  }, [retrieveItems]);
+      return data ?? [];
+    },
+    enabled: !!view,
+  });
 
   return {
     items,
+    queryKey, // Safely exposed memoized key for manual invalidation or realtime synchronization
     isRetrieving,
-    retrieveError,
-    retrieveItems
+    retrieveError: retrieveError?.message || null,
+    retrieveItems,
   };
-
 }

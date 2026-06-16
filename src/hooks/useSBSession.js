@@ -1,124 +1,63 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useEffect } from "react";
 import supabase from "../api/supabase.js";
 
 export default function useSBSession() {
-  const mountedRef = useRef(false);
-  const lastRefreshRef = useRef(0); // throttle refresh
+  const queryClient = useQueryClient();
+  const queryKey = ['supabase', 'session'];
 
-  const [session, setSession] = useState(null);
-  const [user, setUser] = useState(null);
-
-  const [isSessionLoading, setIsSessionLoading] = useState(true);
-  const [sessionError, setSessionError] = useState(null);
-
-  // ─── Retrieve Session ───
-  const retrieveSession = useCallback(async () => {
-    try {
-      setSessionError(null);
-
+  // ─── Declarative Session Query ───
+  const {
+    data: session = null,
+    isPending: isSessionLoading, // Modern v5 naming semantics
+    error: queryError,
+  } = useQuery({
+    queryKey,
+    queryFn: async () => {
+      // NOTE: For SSR apps (Next.js/Remix), replace getSession() with getUser()
       const { data, error } = await supabase.auth.getSession();
       if (error) throw error;
+      return data?.session ?? null;
+    },
+    staleTime: Infinity, // The cache stays fresh forever because the listener updates it
+    gcTime: Infinity,
+  });
 
-      if (!mountedRef.current) return;
-
-      const newSession = data?.session ?? null;
-
-      setSession(prev =>
-        prev?.access_token === newSession?.access_token ? prev : newSession
-      );
-
-      setUser(prev =>
-        prev?.id === newSession?.user?.id
-          ? prev
-          : newSession?.user ?? null
-      );
-
-    } catch (err) {
-      console.error("Session retrieval failed:", err);
-      if (mountedRef.current) {
-        setSessionError(err.message || "Failed to load session");
-      }
-    }
-  }, []);
-
-  // ─── SAFE Refresh (throttled) ───
-  const refreshSession = useCallback(async () => {
-    const now = Date.now();
-
-    // ⛔ Prevent spamming → avoids 429
-    if (now - lastRefreshRef.current < 60000) return;
-
-    lastRefreshRef.current = now;
-
-    try {
-      const { data, error } = await supabase.auth.refreshSession();
-      if (error) throw error;
-
-      if (!mountedRef.current) return;
-
-      const newSession = data?.session ?? null;
-
-      setSession(newSession);
-      setUser(newSession?.user ?? null);
-
-    } catch (err) {
-      if (mountedRef.current) {
-        setSessionError(err.message || "Failed to refresh session");
-      }
-    }
-  }, []);
-
-  // ─── Initialize ───
+  // ─── Auth State Listener ───
   useEffect(() => {
-    mountedRef.current = true;
-
-    const init = async () => {
-      await retrieveSession();
-      if (mountedRef.current) {
-        setIsSessionLoading(false);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, newSession) => {
+        // Handle all updates including SIGNED_IN, SIGNED_OUT, and TOKEN_REFRESHED
+        queryClient.setQueryData(queryKey, newSession ?? null);
+        
+        // Optional: If you want to wipe all other cached data on sign out
+        if (event === "SIGNED_OUT") {
+          queryClient.clear(); 
+        }
       }
-    };
-
-    init();
-
-    const {
-      data: { subscription }
-    } = supabase.auth.onAuthStateChange((_event, newSession) => {
-      if (!mountedRef.current) return;
-
-      setSession(prev =>
-        prev?.access_token === newSession?.access_token
-          ? prev
-          : newSession
-      );
-
-      setUser(prev =>
-        prev?.id === newSession?.user?.id
-          ? prev
-          : newSession?.user ?? null
-      );
-
-      setIsSessionLoading(false);
-    });
+    );
 
     return () => {
-      mountedRef.current = false;
       subscription.unsubscribe();
     };
-  }, [retrieveSession]);
+  }, [queryClient]);
 
+  // ─── Derived State (No extra states/effects needed) ───
+  const user = session?.user ?? null;
   const isAuthenticated = !!user;
+  const sessionError = queryError ? (queryError.message || "Failed to load session") : null;
+
+  // Manual imperative refetch trigger
+  const retrieveSession = async () => {
+    await queryClient.invalidateQueries({ queryKey });
+  };
 
   return {
     session,
     user,
-
     isAuthenticated,
     isSessionLoading,
-
     sessionError,
-
     retrieveSession,
-    refreshSession // safe but optional
   };
 }

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import supabase from "../api/supabase.js";
 
 export default function useSBTable({
@@ -7,111 +7,70 @@ export default function useSBTable({
   retrieveFields = "*",
   filters = [],        // [{ column, operator = "eq", value }]
   orderBy = null,      // { column, ascending: true }
-  limit = null,   
-  realtime = false,
+  limit = null,
 }) {
 
-  const [items, setItems] = useState([]);
+  const queryClient = useQueryClient();
 
-  const [isRetrieving, setIsRetrieving] = useState(false);
-  const [isAdding, setIsAdding] = useState(false);
-  const [isUpdating, setIsUpdating] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
-
-  const [retrieveError, setRetrieveError] = useState(null);
-  const [addError, setAddError] = useState(null);
-  const [updateError, setUpdateError] = useState(null);
-  const [deleteError, setDeleteError] = useState(null);
-
-  // ─── Stabilize retrieveFields dependency ───
-  const fieldsKey = Array.isArray(retrieveFields)
-    ? retrieveFields.join(",")
-    : retrieveFields;
+  // Stable query key
+  const queryKey = [
+    table,
+    'list',
+    retrieveFields,
+    filters,
+    orderBy,
+    limit,
+  ].filter(Boolean);
 
   // ─── Fetch items ───
-  const retrieveItems = useCallback(async () => {
-
-    if (!table) return;
-    if (!Array.isArray(filters)) return;
-
-    setIsRetrieving(true);
-    setRetrieveError(null);
-
-    try {
-
-      const selectFields = Array.isArray(retrieveFields)
-        ? retrieveFields.join(", ")
-        : retrieveFields;
+  const {
+    data: items = [],
+    isLoading: isRetrieving,
+    error: retrieveError,
+    refetch: retrieveItems,
+  } = useQuery({
+    queryKey,
+    queryFn: async () => {
+      if (!table) return [];
 
       let query = supabase
         .from(table)
-        .select(selectFields);
-        
-      // ─── Apply filters (.eq, .gt, etc.) ───
+        .select(
+          Array.isArray(retrieveFields)
+            ? retrieveFields.join(", ")
+            : retrieveFields
+        );
+
+      // Apply filters
       filters.forEach(({ column, operator = "eq", value }) => {
         if (typeof query[operator] === "function") {
           query = query[operator](column, value);
         }
       });
 
-      // ─── Apply ordering ───
+      // Apply ordering
       if (orderBy?.column) {
         query = query.order(orderBy.column, {
-          ascending: orderBy.ascending ?? true
+          ascending: orderBy.ascending ?? true,
         });
       }
 
-      // ─── Apply limit ───
+      // Apply limit
       if (limit) {
         query = query.limit(limit);
       }
-      
+
       const { data, error } = await query;
 
       if (error) throw error;
+      return data ?? [];
+    },
+    enabled: !!table,
+  });
 
-      // Merge instead of overwrite (prevents realtime race bug)
-      setItems((prev = []) => {
-
-        const map = new Map();
-
-        prev.forEach((item) => {
-          map.set(item[pkField], item);
-        });
-
-        (data ?? []).forEach((item) => {
-          map.set(item[pkField], item);
-        });
-
-        return Array.from(map.values());
-
-      });
-
-    } catch (err) {
-
-      console.error(`Retrieve ${table} failed:`, err);
-      setRetrieveError(err.message || `Failed to load ${table}`);
-
-    } finally {
-
-      setIsRetrieving(false);
-
-    }
-
-  }, [table, fieldsKey, pkField, JSON.stringify(filters), orderBy, limit]);
-
-  useEffect(() => {
-    retrieveItems();
-  }, [retrieveItems]);
-
-  // ─── Add ───
-  const addItem = async (fields) => {
-
-    setIsAdding(true);
-    setAddError(null);
-
-    try {
-
+  // ─── Add mutation ───
+  const addMutation = useMutation({
+    mutationFn: async (fields) => {
       const { data, error } = await supabase
         .from(table)
         .insert([fields])
@@ -119,117 +78,86 @@ export default function useSBTable({
         .single();
 
       if (error) throw error;
+      return data;
+    },
+    onSuccess: (newItem) => {
+      queryClient.setQueryData(queryKey, (old = []) => [...old, newItem]);
+    },
+  });
 
-      if (!realtime && data) {
-        setItems((prev = []) => [...prev, data]);
-      }
-
-    } catch (err) {
-
-      console.error(`Add to ${table} failed:`, err);
-      setAddError(err.message || `Failed to add item`);
-
-    } finally {
-
-      setIsAdding(false);
-
-    }
-
-  };
-
-  // ─── Update ───
-  const updateItem = async (id, fields) => {
-
-    setIsUpdating(true);
-    setUpdateError(null);
-
-    try {
-
+  // ─── Update mutation ───
+  const updateMutation = useMutation({
+    mutationFn: async ({ id, fields }) => {
       const { error } = await supabase
         .from(table)
         .update(fields)
         .eq(pkField, id);
 
       if (error) throw error;
+      return { id, fields };
+    },
+    onSuccess: ({ id, fields }) => {
+      queryClient.setQueryData(queryKey, (old = []) =>
+        old.map((item) =>
+          item[pkField] === id ? { ...item, ...fields } : item
+        )
+      );
+    },
+  });
 
-      if (!realtime) {
-
-        setItems((prev = []) =>
-          prev.map((item) =>
-            item[pkField] === id ? { ...item, ...fields } : item
-          )
-        );
-
-      }
-
-    } catch (err) {
-
-      console.error(`Update ${table} failed:`, err);
-      setUpdateError(err.message || `Failed to update item`);
-
-    } finally {
-
-      setIsUpdating(false);
-
-    }
-
-  };
-
-  // ─── Delete ───
-  const deleteItem = async (id) => {
-
-    setIsDeleting(true);
-    setDeleteError(null);
-
-    try {
-
+  // ─── Delete mutation ───
+  const deleteMutation = useMutation({
+    mutationFn: async (id) => {
       const { error } = await supabase
         .from(table)
         .delete()
         .eq(pkField, id);
 
       if (error) throw error;
+      return id;
+    },
+    onSuccess: (id) => {
+      queryClient.setQueryData(queryKey, (old = []) =>
+        old.filter((item) => item[pkField] !== id)
+      );
+    },
+  });
 
-      if (!realtime) {
-
-        setItems((prev = []) =>
-          prev.filter((item) => item[pkField] !== id)
-        );
-
-      }
-
-    } catch (err) {
-
-      console.error(`Delete from ${table} failed:`, err);
-      setDeleteError(err.message || `Failed to delete item`);
-
-    } finally {
-
-      setIsDeleting(false);
-
-    }
-
-  };
+  // Convenience wrappers (React Compiler will memoize these)
+  const addItem = (fields) => addMutation.mutateAsync(fields);
+  const updateItem = (id, fields) => updateMutation.mutateAsync({ id, fields });
+  const deleteItem = (id) => deleteMutation.mutateAsync(id);
 
   return {
     table,
     items,
-    setItems,
+    queryKey,                    // ← Exposed for useSBRealtime
+
+    setItems: (updater) => {
+      queryClient.setQueryData(queryKey, typeof updater === 'function'
+        ? updater(items)
+        : updater
+      );
+    },
 
     isRetrieving,
-    isAdding,
-    isUpdating,
-    isDeleting,
+    isAdding: addMutation.isPending,
+    isUpdating: updateMutation.isPending,
+    isDeleting: deleteMutation.isPending,
 
-    retrieveError,
-    addError,
-    updateError,
-    deleteError,
+    retrieveError: retrieveError?.message || null,
+    addError: addMutation.error?.message || null,
+    updateError: updateMutation.error?.message || null,
+    deleteError: deleteMutation.error?.message || null,
 
     retrieveItems,
     addItem,
     updateItem,
     deleteItem,
-  };
 
+    // Expose raw mutations for full control when needed
+    addMutation,
+    updateMutation,
+    deleteMutation,
+  };
 }

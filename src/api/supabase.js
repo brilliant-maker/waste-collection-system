@@ -9,10 +9,11 @@ const supabase = createClient(
   {
     auth : {
       persistSession : true,
-      autoRefreshToken : false,
+      autoRefreshToken : true,
       detectSessionInUrl : true,
       storage : window.localStorage,
-      storageKey : "userSession"
+      storageKey : "userSession",
+      multiTab : false
     }
   }
 );

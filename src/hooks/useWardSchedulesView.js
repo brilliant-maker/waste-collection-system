@@ -1,11 +1,13 @@
 import useSBView from "./useSBView.js";
 import useProfile from "./useProfile.js";
+import useSession from "./useSession.js";
 
 export default function useWardSchedulesView() {
   
+  const { session } = useSession();
   const { profile } = useProfile();
   
-  const isReady = !!profile;
+  const isReady = !!session && !!profile;
   
   const wardId = profile?.ward_id ?? null;
   const profileId = profile?.profile_id ?? null;
