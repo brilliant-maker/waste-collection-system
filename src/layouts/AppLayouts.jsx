@@ -12,7 +12,7 @@ export default function AppLayouts({ children }) {
       <Center>
         <LoadingText>
           Loading...
-        </LoadingText>;
+        </LoadingText>
       </Center>
     );
   }
