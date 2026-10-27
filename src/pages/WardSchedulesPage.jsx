@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Center from "../components/Center.jsx";
 import LoadingText from "../components/LoadingText.jsx";
 import ErrorText from "../components/ErrorText.jsx";
 import WardSchedulesHeader from "../components/WardSchedulesHeader.jsx";
@@ -11,21 +12,21 @@ import useSort from "../hooks/useSort.js";
 import usePaginate from "../hooks/usePaginate.js";
 
 export default function WardSchedulesPage() {
-  
+
   const [searchBy, setSearchBy] = useState("shift_type");
-  
+
   const hook = useWardSchedulesPage();
-  
+
   const { searchQuery, setSearchQuery, searchedData } = useSearch(hook?.wardSchedules ?? [], (item, query) => String(item[searchBy])
       .toLowerCase()
       .includes(query.toLowerCase())
   );
-  
+
   const { filteredData } = useFilter(searchedData, {
       conditionFn: (schedule) =>
       schedule.day_name === hook?.selectedDay.dayName
   });
-  
+
   const { sortedData } = useSort(
   filteredData,
   (a, b, { sortDirection }) => {
@@ -36,7 +37,7 @@ export default function WardSchedulesPage() {
     return sortDirection === "asc" ? diff : -diff;
   }
   );
-  
+
   const {
     currentPage,
     pages,
@@ -47,14 +48,34 @@ export default function WardSchedulesPage() {
     prevPage,
     paginatedData
   } = usePaginate(sortedData, 2);
-  
-  if (hook.isLoading) return <LoadingText>Loading...</LoadingText>;
-  
-  if (hook.error) return <ErrorText>Error: {hook.error}</ErrorText>;
-  
+
+  if (hook.isLoading) {
+    
+    return (
+      <Center>
+        <LoadingText>
+          Loading...
+        </LoadingText>
+      </Center>
+    );
+    
+  }
+
+  if (hook.error) {
+    
+    return (
+      <Center>
+        <ErrorText>
+          Error: {hook.error}
+        </ErrorText>
+      </Center>
+    );
+    
+  }
+
   const wardName = hook.profile?.ward_name;
   const roleType = hook.profile?.role_type;
-  
+
   const isWardSupervisor = roleType === "Ward Supervisor";
 
   return (
@@ -64,7 +85,7 @@ export default function WardSchedulesPage() {
         isWardSupervisor={isWardSupervisor}
         handleAddWardScheduleClick={hook.handleAddWardScheduleClick}
         handleSelectWardScheduleDayClick={hook.handleSelectWardScheduleDayClick} />
-        
+
       <WardSchedulesMain
         schedules={paginatedData}
         searchQuery={searchQuery}
@@ -72,7 +93,7 @@ export default function WardSchedulesPage() {
         searchBy={searchBy}
         setSearchBy={setSearchBy}
         {...hook} />
-        
+
       <WardSchedulesCollectionsFooter
         currentPage={currentPage}
         pages={pages}

@@ -7,6 +7,8 @@ html.no-transition * {
    Light Theme
 ───────────────────────────────────────────────── */
 :root {
+  /* Theme */
+  color-scheme: light;
   /* Base backgrounds */
   --background-color-1: #ffffff;
   --background-color-2: #fafafa;
@@ -55,6 +57,8 @@ html.no-transition * {
    Dark Theme
 ───────────────────────────────────────────────── */
 [data-theme="dark"] {
+  /* Theme */
+  color-scheme: dark;
   /* Base backgrounds */
   --background-color-1: #0f0f10;
   --background-color-2: #18181b;
@@ -81,7 +85,7 @@ html.no-transition * {
   --color-success: #34d399;
   --color-warning: #fbbf24;
   --color-info: #38bdf8;
-  
+
   --color-muted: #27272a;
   --color-surface: #18181b;
 

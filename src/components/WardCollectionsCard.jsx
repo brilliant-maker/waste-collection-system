@@ -1,6 +1,7 @@
 import Header from "./Header.jsx";
 import Main from "./Main.jsx";
 import Card from "./Card.jsx";
+import Div from "./Div.jsx";
 import HeadingTwo from "./HeadingTwo.jsx";
 import Text from "./Text.jsx";
 import Button from "./Button.jsx";
@@ -82,6 +83,7 @@ export default function WardCollectionsCard({
             : 
             `Missed Note: ${wardCollection.collection_note_short}`}
           </Text>
+          <Div className="card-main-mobile-buttons">
           {((isWardSupervisor) && (isMobile)) && (
             <Button
               className="card-main-button button-outline button-small"
@@ -116,6 +118,7 @@ export default function WardCollectionsCard({
               View Zones
             </Button>
           )}
+          </Div>
           
           {((isWardSupervisor) && (isTablet || isLaptop || isDesktop)) && (
             <WardScheduleZonesCard

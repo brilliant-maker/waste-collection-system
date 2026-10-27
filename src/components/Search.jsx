@@ -12,7 +12,8 @@ export default function Search({
   fields = []
 }) {
   return (
-    <Div>
+    <Div
+      className="search-controls">
       <Select
         value={searchBy}
         onChange={(e) => setSearchBy(e.target.value)}
@@ -23,7 +24,7 @@ export default function Search({
           </Option>
         ))}
       </Select>
-      
+
       <SearchInput
         placeholder={placeholder}
         value={searchQuery}

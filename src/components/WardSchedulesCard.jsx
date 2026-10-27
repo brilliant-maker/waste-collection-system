@@ -2,6 +2,7 @@ import Header from "./Header.jsx";
 import Main from "./Main.jsx";
 import Footer from "./Footer.jsx";
 import Card from "./Card.jsx";
+import Div from "./Div.jsx";
 import HeadingTwo from "./HeadingTwo.jsx";
 import Text from "./Text.jsx";
 import Button from "./Button.jsx";
@@ -68,6 +69,7 @@ export default function WardSchedulesCard({
           <Text>
             Vehicle Plate Number: {wardSchedule.ward_vehicle_plate_number}
           </Text>
+          <Div className="card-main-mobile-buttons">
 
           {((isWardDriver || isWardLoader) && (isMobile)) && (
             <Button
@@ -116,6 +118,8 @@ export default function WardSchedulesCard({
               View Zones
             </Button>
           )}
+          
+          </Div>
           
           {((isWardSupervisor || isWardDriver || isWardLoader) && (isTablet || isLaptop || isDesktop)) && (
             <WardScheduleZonesCard

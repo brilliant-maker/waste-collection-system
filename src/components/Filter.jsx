@@ -12,7 +12,8 @@ export default function Filter({
   fields = []
 }) {
   return (
-    <Div>
+    <Div
+      className="filter-controls">
       <Select
         value={filterBy}
         onChange={(e) => setFilterBy(e.target.value)}
@@ -23,7 +24,7 @@ export default function Filter({
           </Option>
         ))}
       </Select>
-      
+
       <TextInput
         placeholder={placeholder}
         value={filterQuery}

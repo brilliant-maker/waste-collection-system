@@ -10,7 +10,8 @@ export default function Sort({
   fields = []
 }) {
   return (
-    <Div>
+    <Div
+      className="sort-controls">
       <Select
         value={sortBy || ""}
         onChange={(e) => setSortBy(e.target.value)}

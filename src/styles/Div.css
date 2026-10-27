@@ -1,0 +1,16 @@
+.ward-schedules-header-buttons {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.ward-schedules-select-day-button {
+  margin-left: auto;
+}
+
+.search-controls, .filter-controls, .sort-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}

@@ -102,7 +102,7 @@ export default function WardCollectionsAccordions({
   return (
     <>
       <Accordion
-        title="Search Filter Sort"
+        title="Search | Filter | Sort"
         isOpen={isOpen}
         onToggle={handleToggle}>
           <AccordionGroup

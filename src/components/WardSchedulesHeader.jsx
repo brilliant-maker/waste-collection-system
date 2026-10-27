@@ -1,6 +1,7 @@
 import Header from "./Header.jsx";
 import HeadingTwo from "./HeadingTwo.jsx";
 import Button from "./Button.jsx";
+import Div from "./Div.jsx";
 
 export default function WardSchedulesHeader({
   wardName,
@@ -14,18 +15,21 @@ export default function WardSchedulesHeader({
       <HeadingTwo>
         {wardName} Schedules
       </HeadingTwo>
-      {isWardSupervisor && (
-      <Button
-        className="button-primary button-medium"
-        onClick={handleAddWardScheduleClick}>
-        Add Schedule
-      </Button>
-      )}
-      <Button
-        className="button-outline button-small"
-        onClick={handleSelectWardScheduleDayClick}>
-        Select Day
-      </Button>
+      <Div
+        className="ward-schedules-header-buttons">
+        {isWardSupervisor && (
+        <Button
+          className="button-primary button-medium"
+          onClick={handleAddWardScheduleClick}>
+          Add Schedule
+        </Button>
+        )}
+        <Button
+          className="button-outline button-small ward-schedules-select-day-button"
+          onClick={handleSelectWardScheduleDayClick}>
+          Select Day
+        </Button>
+      </Div>
     </Header>
   );
 }

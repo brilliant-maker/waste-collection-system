@@ -8,6 +8,7 @@ import Label from "../components/Label.jsx";
 import EmailInput from "../components/EmailInput.jsx";
 import PasswordInput from "../components/PasswordInput.jsx";
 import Button from "../components/Button.jsx";
+import Center from "../components/Center.jsx";
 import ErrorText from "../components/ErrorText.jsx";
 
 export default function SignInPage() {
@@ -22,11 +23,11 @@ export default function SignInPage() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  
+
   const handleEmailChange = (event) => {
     setEmail(event.target.value);
   }
-  
+
   const handlePasswordChange = (event) => {
     setPassword(event.target.value);
   }
@@ -34,7 +35,7 @@ export default function SignInPage() {
   const handleSignIn = async (event) => {
 
     event.preventDefault();
-    
+
     await signIn({ email, password });
 
     navigate("/ward_schedules", { replace:true });
@@ -75,7 +76,11 @@ export default function SignInPage() {
         </Fieldset>
       </Form>
       {signInError && (
-        <ErrorText>{signInError}</ErrorText>
+        <Center>
+          <ErrorText>
+            {signInError}
+          </ErrorText>
+        </Center>
       )}
     </>
   );

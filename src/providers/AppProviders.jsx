@@ -11,7 +11,7 @@ import SidebarProvider from "./SidebarProvider.jsx";
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      // Keep everything fresh for at least 30 seconds by default
+      // Keep stale data for 30 seconds
       staleTime: 1000 * 30, 
     },
   },
@@ -21,17 +21,17 @@ export default function AppProviders({ children }) {
   return (
     <QueryClientProvider
       client={queryClient}>
-      <SessionProvider>
-        <ProfileProvider>
-          <DeviceProvider>
-            <ThemeProvider>
+      <DeviceProvider>
+        <ThemeProvider>
+          <SessionProvider>
+            <ProfileProvider>
               <SidebarProvider>
-                  {children}
+                {children}
               </SidebarProvider>
-            </ThemeProvider>
-          </DeviceProvider>
-        </ProfileProvider>
-      </SessionProvider>
+            </ProfileProvider>
+          </SessionProvider>
+        </ThemeProvider>
+      </DeviceProvider>
     </QueryClientProvider>
   );
 }

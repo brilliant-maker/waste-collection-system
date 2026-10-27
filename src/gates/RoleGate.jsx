@@ -1,6 +1,7 @@
 import { Navigate, Outlet } from "react-router";
 import useSession from "../hooks/useSession.js";
 import useProfile from "../hooks/useProfile.js";
+import Center from "../components/Center.jsx";
 import LoadingText from "../components/LoadingText.jsx";
 import ErrorText from "../components/ErrorText.jsx";
 
@@ -24,7 +25,13 @@ export default function RoleGate({
   // ─── 1. Session loading ───
   if (isSessionLoading) {
     if (!showLoading) return null;
-    return <LoadingText>Checking session...</LoadingText>;
+    return (
+      <Center>
+        <LoadingText>
+          Loading...
+        </LoadingText>
+      </Center>
+    );
   }
 
   // ─── 2. Not authenticated ───
@@ -35,15 +42,23 @@ export default function RoleGate({
   // ─── 3. Profile loading ───
   if (isProfileLoading) {
     if (!showLoading) return null;
-    return <LoadingText>Loading profile...</LoadingText>;
+    return (
+      <Center>
+        <LoadingText>
+          Loading...
+        </LoadingText>
+      </Center>
+    );
   }
 
   // ─── 4. Profile error ───
   if (profileError) {
     return (
-      <ErrorText>
-        {profileError.message || "Failed to load profile"}
-      </ErrorText>
+      <Center>
+        <ErrorText>
+          {profileError.message || "Failed to load profile"}
+        </ErrorText>
+      </Center>
     );
   }
 
